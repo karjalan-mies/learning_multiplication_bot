@@ -25,13 +25,10 @@ def greet_user(update, context):
 def change_digit(update, context):
     reply_keyboard = [['1', '2', '3', '4', '5', '6', '7', '8', '9']]
     update.message.reply_text('Выбери цифру',
-                              reply_markup=ReplyKeyboardMarkup
-                              (
-                                reply_keyboard,
-                                resize_keyboard=True,
-                                one_time_keyboard=True
-                              )
-                              )
+                              reply_markup=ReplyKeyboardMarkup(
+                                            reply_keyboard,
+                                            resize_keyboard=True,
+                                            one_time_keyboard=True))
     return 'new_task'
 
 
@@ -55,17 +52,29 @@ def check_answer(update, context):
     if str(context.user_data['correct_answer']) == str(update.message.text):
         update.message.reply_text('Правильный ответ!',
                                   reply_markup=task_keyboard())
-        return 'new_task'
+        return 'whats_next'
     else:
         update.message.reply_text(
             f'Неверно! Попробуй еше.\n{context.user_data["task_text"]}',
             reply_markup=task_keyboard())
 
 
+def another_task(update, context):
+    logging.info('Вызов функции "another_task"')
+    user_digit = context.user_data['digit']
+    task_text = f'{user_digit} * {randint(1,9)}'
+    context.user_data['task_text'] = task_text
+    correct_answer = eval(task_text)
+    context.user_data['correct_answer'] = correct_answer
+    message_text = f'Сколько будет {task_text}? Напиши ответ'
+    update.message.reply_text(message_text, reply_markup=task_keyboard())
+    return 'check_answer'
+
+
 def whats_next(update, context):
     logging.info('Вызов функции "whats_next"')
     if update.message.text == 'Еще пример':
-        return 'new_task'
+        return 'another_task'
 
 
 def main():
@@ -75,11 +84,19 @@ def main():
     dp.add_handler(ConversationHandler(
         entry_points=[MessageHandler(Filters.regex('^(Позаниматься)$'),
                                      change_digit)],
-        states={'new_task': [MessageHandler(Filters.regex('^(\d)$'),
-                                            new_task)],
-                'check_answer': [MessageHandler(Filters.regex('^(\d{1,2})$'),
+        states={
+                'check_answer': [MessageHandler(Filters.regex(
+                                                    r'^(\d{1,2})$'),
                                                 check_answer)],
-                'whats_next': [MessageHandler(Filters.text, whats_next)]},
+
+                'whats_next': [MessageHandler(Filters.text, whats_next)],
+
+                'new_task': [MessageHandler(Filters.regex(r'^(\d+)$'),
+                                            new_task)],
+
+                'another_task': [MessageHandler(Filters.regex(
+                                                    r'^(Еще пример)$'),
+                                                another_task)]},
         fallbacks=[]
     ))
     logging.info('Бот стартовал')
