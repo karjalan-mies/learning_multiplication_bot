@@ -2,7 +2,7 @@ import logging
 import os
 from random import randint
 
-from telegram import ReplyKeyboardMarkup
+from telegram import ReplyKeyboardMarkup, ReplyKeyboardRemove
 from telegram.ext import (CommandHandler, ConversationHandler, Filters,
                           MessageHandler, Updater)
 
@@ -34,71 +34,71 @@ def change_digit(update, context):
 
 def new_task(update, context):
     logging.info('Вызов функции "new_task"')
-    user_digit = int(update.message.text)
-    context.user_data['digit'] = user_digit
+    try:
+        user_digit = context.user_data['digit']
+    except KeyError:
+        logging.info('fdf')
+        user_digit = int(update.message.text)
+        context.user_data['digit'] = user_digit
+
     task_text = f'{user_digit} * {randint(1,9)}'
     context.user_data['task_text'] = task_text
     correct_answer = eval(task_text)
-    context.user_data['correct_answer'] = correct_answer
+    context.user_data['correct_answer'] = str(correct_answer)
+    context.user_data['user_answer'] = update.message.text
+    context.user_data['fails'] = 0
     message_text = f'Сколько будет {task_text}? Напиши ответ'
-    update.message.reply_text(message_text, reply_markup=task_keyboard())
+    update.message.reply_text(message_text, reply_markup=ReplyKeyboardRemove())
     return 'check_answer'
 
 
 def check_answer(update, context):
-    logging.info('Вызов функции "check_answer"')
-    # print('correct_answer' + str(update.user_data['correct_answer']))
-    # print('user_answer' + context.message.text)
-    if str(context.user_data['correct_answer']) == str(update.message.text):
-        update.message.reply_text('Правильный ответ!',
+    logging.info(f'Вызов функции "check_answer". {update.message.text}')
+    correct_answer = context.user_data['correct_answer']
+    task_text = context.user_data['task_text']
+    if update.message.text == correct_answer:
+        update.message.reply_text('Молодец! Правильный ответ!\n' +
+                                  f'{task_text} = {correct_answer}.',
                                   reply_markup=task_keyboard())
-        return 'whats_next'
+        context.user_data['fails'] = 0
+        return 'new_task'
     else:
-        update.message.reply_text(
-            f'Неверно! Попробуй еше.\n{context.user_data["task_text"]}',
-            reply_markup=task_keyboard())
+        if context.user_data['fails'] < 2:
+            update.message.reply_text('Не правильный ответ:(\n' +
+                                      'Подумай еще и напиши сколько будет ' +
+                                      f'{task_text}?')
+            context.user_data['fails'] += 1
+            return 'check_answer'
+        else:
+            update.message.reply_text(
+                'Этот пример пока еще плохо знаешь.\n' +
+                f'Подскажу тебе правильный ответ {task_text} = ' +
+                f'{correct_answer}', reply_markup=task_keyboard())
+            context.user_data['fails'] = 0
+            return 'new_task'
 
 
-def another_task(update, context):
-    logging.info('Вызов функции "another_task"')
-    user_digit = context.user_data['digit']
-    task_text = f'{user_digit} * {randint(1,9)}'
-    context.user_data['task_text'] = task_text
-    correct_answer = eval(task_text)
-    context.user_data['correct_answer'] = correct_answer
-    message_text = f'Сколько будет {task_text}? Напиши ответ'
-    update.message.reply_text(message_text, reply_markup=task_keyboard())
-    return 'check_answer'
-
-
-def whats_next(update, context):
-    logging.info('Вызов функции "whats_next"')
-    if update.message.text == 'Еще пример':
-        return 'another_task'
+def show_keyboard(update, context):
+    update.message.reply_text(
+        'Для того, чтобы начать занятие нажми кнопку "Позаниматься"',
+        reply_markup=main_keyboard)
 
 
 def main():
     dp.add_handler(CommandHandler('start', greet_user))
-    dp.add_handler(CommandHandler('new_task', new_task))
     dp.add_handler(CommandHandler('change_digit', change_digit))
     dp.add_handler(ConversationHandler(
         entry_points=[MessageHandler(Filters.regex('^(Позаниматься)$'),
                                      change_digit)],
         states={
-                'check_answer': [MessageHandler(Filters.regex(
-                                                    r'^(\d{1,2})$'),
-                                                check_answer)],
-
-                'whats_next': [MessageHandler(Filters.text, whats_next)],
-
-                'new_task': [MessageHandler(Filters.regex(r'^(\d+)$'),
-                                            new_task)],
-
-                'another_task': [MessageHandler(Filters.regex(
-                                                    r'^(Еще пример)$'),
-                                                another_task)]},
+            'new_task': [MessageHandler(Filters.regex(r'^(\d+)$'),
+                                        new_task),
+                         MessageHandler(Filters.regex(r'^(Еще пример)$'),
+                                        new_task)],
+            'check_answer': [MessageHandler(Filters.text, check_answer)]},
         fallbacks=[]
     ))
+    dp.add_handler(MessageHandler(Filters.text, show_keyboard))
     logging.info('Бот стартовал')
     my_bot.start_polling()
     my_bot.idle()
