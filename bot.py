@@ -23,6 +23,10 @@ def greet_user(update, context):
 
 
 def change_digit(update, context):
+    try:
+        del context.user_data['digit']
+    except KeyError:
+        pass
     reply_keyboard = [['1', '2', '3', '4', '5', '6', '7', '8', '9']]
     update.message.reply_text('Выбери цифру',
                               reply_markup=ReplyKeyboardMarkup(
@@ -37,7 +41,6 @@ def new_task(update, context):
     try:
         user_digit = context.user_data['digit']
     except KeyError:
-        logging.info('fdf')
         user_digit = int(update.message.text)
         context.user_data['digit'] = user_digit
 
@@ -48,12 +51,13 @@ def new_task(update, context):
     context.user_data['user_answer'] = update.message.text
     context.user_data['fails'] = 0
     message_text = f'Сколько будет {task_text}? Напиши ответ'
-    update.message.reply_text(message_text, reply_markup=ReplyKeyboardRemove())
+    update.message.reply_text(message_text,
+                              reply_markup=ReplyKeyboardRemove())
     return 'check_answer'
 
 
 def check_answer(update, context):
-    logging.info(f'Вызов функции "check_answer". {update.message.text}')
+    logging.info('Вызов функции "check_answer".')
     correct_answer = context.user_data['correct_answer']
     task_text = context.user_data['task_text']
     if update.message.text == correct_answer:
@@ -63,7 +67,7 @@ def check_answer(update, context):
         context.user_data['fails'] = 0
         return 'new_task'
     else:
-        if context.user_data['fails'] < 2:
+        if context.user_data['fails'] < 1:
             update.message.reply_text('Не правильный ответ:(\n' +
                                       'Подумай еще и напиши сколько будет ' +
                                       f'{task_text}?')
@@ -71,7 +75,7 @@ def check_answer(update, context):
             return 'check_answer'
         else:
             update.message.reply_text(
-                'Этот пример пока еще плохо знаешь.\n' +
+                'С этим примером пока не удается справиться.\n' +
                 f'Подскажу тебе правильный ответ {task_text} = ' +
                 f'{correct_answer}', reply_markup=task_keyboard())
             context.user_data['fails'] = 0
@@ -80,8 +84,15 @@ def check_answer(update, context):
 
 def show_keyboard(update, context):
     update.message.reply_text(
-        'Для того, чтобы начать занятие нажми кнопку "Позаниматься"',
+        'Чтобы начать занятие нажми кнопку "Позаниматься"',
         reply_markup=main_keyboard)
+
+
+def end_class(update, context):
+    update.message.reply_text('Отлично позанимались!\n' +
+                              'Возвращайся поскорее:)',
+                              reply_markup=main_keyboard())
+    return ConversationHandler.END
 
 
 def main():
@@ -94,8 +105,12 @@ def main():
             'new_task': [MessageHandler(Filters.regex(r'^(\d+)$'),
                                         new_task),
                          MessageHandler(Filters.regex(r'^(Еще пример)$'),
-                                        new_task)],
-            'check_answer': [MessageHandler(Filters.text, check_answer)]},
+                                        new_task),
+                         MessageHandler(Filters.regex(r'^(Завершить)$'),
+                                        end_class),
+                         MessageHandler(Filters.regex(r'^(Другая цифра)$'),
+                                        change_digit)],
+            'check_answer': [MessageHandler(Filters.text, check_answer)],},
         fallbacks=[]
     ))
     dp.add_handler(MessageHandler(Filters.text, show_keyboard))
