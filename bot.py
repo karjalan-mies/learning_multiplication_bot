@@ -44,7 +44,7 @@ def new_task(update, context):
         user_digit = int(update.message.text)
         context.user_data['digit'] = user_digit
 
-    task_text = f'{user_digit} * {randint(1,9)}'
+    task_text = f'{user_digit} * {randint(2,9)}'
     context.user_data['task_text'] = task_text
     correct_answer = eval(task_text)
     context.user_data['correct_answer'] = str(correct_answer)
@@ -61,6 +61,10 @@ def check_answer(update, context):
     correct_answer = context.user_data['correct_answer']
     task_text = context.user_data['task_text']
     if update.message.text == correct_answer:
+        context.bot.send_sticker(
+            update.effective_chat.id,
+            'CAACAgIAAxkBAAIb12LATcTAOGI1loMSNtyn4R75IUAMAAI' +
+            'lAwACz7vUDn72oSUPiLS8KQQ')
         update.message.reply_text('Молодец! Правильный ответ!\n' +
                                   f'{task_text} = {correct_answer}.',
                                   reply_markup=task_keyboard())
@@ -68,6 +72,10 @@ def check_answer(update, context):
         return 'new_task'
     else:
         if context.user_data['fails'] < 1:
+            context.bot.send_sticker(
+                update.effective_chat.id,
+                'CAACAgIAAxkBAAIb2WLAtBJV6j-rJWDszaGGlcXlEeEnAAIWAwACz7vUDu' +
+                'Uef92K6MHnKQQ')
             update.message.reply_text('Не правильный ответ:(\n' +
                                       'Подумай еще и напиши сколько будет ' +
                                       f'{task_text}?')
