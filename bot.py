@@ -27,7 +27,7 @@ def change_digit(update, context):
         del context.user_data['digit']
     except KeyError:
         pass
-    reply_keyboard = [['1', '2', '3', '4', '5', '6', '7', '8', '9']]
+    reply_keyboard = [['1', '2', '3', '4', '5', '6', '7', '8', '9', '1-9']]
     update.message.reply_text('Выбери цифру',
                               reply_markup=ReplyKeyboardMarkup(
                                             reply_keyboard,
@@ -41,10 +41,12 @@ def new_task(update, context):
     try:
         user_digit = context.user_data['digit']
     except KeyError:
-        user_digit = int(update.message.text)
+        user_digit = update.message.text
         context.user_data['digit'] = user_digit
-
     task_text = f'{user_digit} * {randint(2,9)}'
+    if user_digit == '1-9':
+        task_text = f'{randint(2,9)} * {randint(2,9)}'
+
     context.user_data['task_text'] = task_text
     correct_answer = eval(task_text)
     context.user_data['correct_answer'] = str(correct_answer)
@@ -110,10 +112,10 @@ def main():
         entry_points=[MessageHandler(Filters.regex('^(Позаниматься)$'),
                                      change_digit)],
         states={
-            'new_task': [MessageHandler(Filters.regex(r'^(\d+)$'),
+            'new_task': [MessageHandler(Filters.regex(r'^(\d+|Еще пример|1-9)$'),
                                         new_task),
-                         MessageHandler(Filters.regex(r'^(Еще пример)$'),
-                                        new_task),
+                        #  MessageHandler(Filters.regex(r'^(Еще пример)$'),
+                        #                 new_task),
                          MessageHandler(Filters.regex(r'^(Завершить)$'),
                                         end_class),
                          MessageHandler(Filters.regex(r'^(Другая цифра)$'),
