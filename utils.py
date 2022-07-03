@@ -10,6 +10,14 @@ def main_keyboard():
 
 def task_keyboard():
     return ReplyKeyboardMarkup(
-        [['Еще пример', 'Другая цифра', 'Завершить']],
+        [['Еще пример', 'Выбрать цифру', 'Завершить']],
         resize_keyboard=True
+    )
+
+
+def change_digit_keyboard():
+    return ReplyKeyboardMarkup(
+        [['1', '2', '3', '4', '5', '6', '7', '8', '9', 'X']],
+        resize_keyboard=True,
+        one_time_keyboard=True
     )
