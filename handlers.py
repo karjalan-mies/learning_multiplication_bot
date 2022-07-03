@@ -35,7 +35,6 @@ def new_task(update, context):
     except KeyError:
         user_digit = update.message.text
         context.user_data['digit'] = user_digit
-    get_x1(update, context)
     task_text = f'{user_digit} * {randint(2,9)}'
     if user_digit == 'X':
         task_text = f'{randint(2,9)} * {randint(2,9)}'
