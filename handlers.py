@@ -55,9 +55,7 @@ def check_answer(update, context):
     correct_answer = context.user_data['correct_answer']
     task_text = context.user_data['task_text']
     if update.message.text == correct_answer:
-        context.bot.send_sticker(
-            update.effective_chat.id,
-            get_sticker(True))
+        context.bot.send_sticker(update.effective_chat.id, get_sticker(True))
         update.message.reply_text(get_message_text(True) +
                                   f'\n{task_text} = {correct_answer}.',
                                   reply_markup=task_keyboard())
@@ -65,9 +63,8 @@ def check_answer(update, context):
         return 'new_task'
     else:
         if context.user_data['fails'] < 1:
-            context.bot.send_sticker(
-                update.effective_chat.id,
-                get_sticker(False))
+            context.bot.send_sticker(update.effective_chat.id,
+                                     get_sticker(False))
             update.message.reply_text(get_message_text(False) +
                                       '\nПодумай еще и напиши сколько будет ' +
                                       f'{task_text}?')
