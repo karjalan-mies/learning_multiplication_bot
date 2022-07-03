@@ -6,7 +6,7 @@ from telegram.ext import ConversationHandler
 
 from answers import get_message_text
 from stickers import get_sticker
-from utils import main_keyboard, task_keyboard, change_digit_keyboard
+from keyboards import main_keyboard, task_keyboard, change_digit_keyboard
 
 
 def greet_user(update, context):
@@ -35,6 +35,7 @@ def new_task(update, context):
     except KeyError:
         user_digit = update.message.text
         context.user_data['digit'] = user_digit
+    get_x1(update, context)
     task_text = f'{user_digit} * {randint(2,9)}'
     if user_digit == 'X':
         task_text = f'{randint(2,9)} * {randint(2,9)}'
