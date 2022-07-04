@@ -10,7 +10,6 @@ from handlers import (change_digit, check_answer, end_class, greet_user,
 logging.basicConfig(filename='bot.log', level=logging.INFO)
 
 API_TOKEN = os.environ.get('API_TOKEN')
-
 my_bot = Updater(API_TOKEN, use_context=True)
 dp = my_bot.dispatcher
 

@@ -82,7 +82,7 @@ def check_answer(update, context):
 def show_keyboard(update, context):
     update.message.reply_text(
         'Чтобы начать занятие нажми кнопку "Позаниматься"',
-        reply_markup=main_keyboard)
+        reply_markup=main_keyboard())
 
 
 def end_class(update, context):
