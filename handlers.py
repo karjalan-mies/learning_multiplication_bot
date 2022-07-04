@@ -85,6 +85,10 @@ def show_keyboard(update, context):
         reply_markup=main_keyboard())
 
 
+def wrong_answer(update, context):
+    update.message.reply_text('Я тебя не понимаю. Повтори ввод.')
+
+
 def end_class(update, context):
     update.message.reply_text('Отлично позанимались!\n' +
                               'Возвращайся поскорее:)',

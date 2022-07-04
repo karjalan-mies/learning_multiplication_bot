@@ -5,7 +5,7 @@ from telegram.ext import (CommandHandler, ConversationHandler, Filters,
                           MessageHandler, Updater)
 
 from handlers import (change_digit, check_answer, end_class, greet_user,
-                      new_task, show_keyboard)
+                      new_task, show_keyboard, wrong_answer)
 
 logging.basicConfig(filename='bot.log', level=logging.INFO)
 
@@ -29,7 +29,10 @@ def main():
                          MessageHandler(Filters.regex(r'^(Выбрать цифру)$'),
                                         change_digit)],
             'check_answer': [MessageHandler(Filters.text, check_answer)]},
-        fallbacks=[]
+        fallbacks=[
+            MessageHandler(Filters.text | Filters.photo | Filters.video |
+                       Filters.document | Filters.location, wrong_answer)
+        ]
     ))
     dp.add_handler(MessageHandler(Filters.text, show_keyboard))
     logging.info('Бот стартовал')
