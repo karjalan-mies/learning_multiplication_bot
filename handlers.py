@@ -5,8 +5,9 @@ from telegram import ReplyKeyboardRemove
 from telegram.ext import ConversationHandler
 
 from answers import get_message_text
-from stickers import get_sticker
 from keyboards import main_keyboard, task_keyboard, change_digit_keyboard
+from stickers import get_sticker
+from utils import get_x
 
 
 def greet_user(update, context):
@@ -31,11 +32,20 @@ def change_digit(update, context):
 def new_task(update, context):
     logging.info('Вызов функции "new_task"')
     try:
+        list_of_numbers = context.user_data['list_of_numbers']
+    except KeyError:
+        list_of_numbers = []
+        context.user_data['list_of_numbers'] = list_of_numbers
+
+    try:
         user_digit = context.user_data['digit']
     except KeyError:
         user_digit = update.message.text
         context.user_data['digit'] = user_digit
-    task_text = f'{user_digit} * {randint(2,9)}'
+    x2,  context.user_data['list_of_numbers'] = get_x(
+                                        context.user_data['list_of_numbers'])
+    
+    task_text = f'{user_digit} * {x2}'
     if user_digit == 'X':
         task_text = f'{randint(2,9)} * {randint(2,9)}'
 
