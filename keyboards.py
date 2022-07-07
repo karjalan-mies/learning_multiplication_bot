@@ -17,7 +17,7 @@ def task_keyboard():
 
 def change_digit_keyboard():
     return ReplyKeyboardMarkup(
-        [['1', '2', '3', '4', '5', '6', '7', '8', '9', 'X']],
+        [['2', '3', '4', '5', '6', '7', '8', '9', 'X']],
         resize_keyboard=True,
         one_time_keyboard=True
     )
