@@ -24,3 +24,5 @@
 ![Screenshot 6](https://github.com/karjalan-mies/learning_multiplication_bot/blob/master/images/006.png)
 
 ![Screenshot 7](https://github.com/karjalan-mies/learning_multiplication_bot/blob/master/images/007.png)
+
+[Проверить свои силы в умножении](https://t.me/learning_multiplication_bot)
