@@ -26,3 +26,59 @@
 ![Screenshot 7](https://github.com/karjalan-mies/learning_multiplication_bot/blob/master/images/007.png)
 
 [Проверить свои силы в умножении](https://t.me/learning_multiplication_bot)
+
+## Сборка репозитория и локальный запуск
+1. Запустите консоль
+2. Перейдите в каталог с проектами или создайте при необходимости
+3. Выполните команду:
+
+    ```
+    git clone https://github.com/karjalan-mies/learning_multiplication_bot
+    ```
+4. Перейдите в каталог **"learning_multiplication_bot"**
+5. Создайте виртуальное окружение командой
+    ```
+    python3 -m venv env
+    ```
+6. Добавьте переменные окружения
+
+    6.1. Для Windows:
+
+    6.1.1 Откройте файл ```"\env\Scripts\activate.bat"``` и добавте в него строку:
+    ```
+    set API_TOKEN=ваш_токет_для_телеграм
+    ```
+    6.1.2 Откройте файл ```"\env\Scripts\activate"``` и добавьте в него строки:
+    ```
+    set API_TOKEN='ваш_токет_для_телеграм'
+    export API_TOKEN
+    ```
+    6.2 Для Linux:
+    
+    6.2.1 Откройте файл ```/env/bin/activate``` и добавьте в него строку:
+    ```
+    API_TOKEN='ваш_токет_для_телеграм'
+    export API_TOKEN
+    ```
+
+7. Активируйте виртульаное окружение:
+
+    7.1 Для Windows:
+    ```
+    env\Scripts\activate
+    ```
+
+    7.2 Для Linux:
+    ```
+    Source /env/bin/activate
+    ```
+
+8. Установите зависимости командой
+    ```
+    pip install -r requirements.txt
+    ```
+
+9. Запустите бота командой:
+    ```
+    python3 bot.py
+    ```
